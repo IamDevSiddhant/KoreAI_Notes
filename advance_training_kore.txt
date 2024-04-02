@@ -1,5 +1,4 @@
 Advance training Kore Ai chatbot
-
 1. context management---
 
                                  3 types of interruption management-
