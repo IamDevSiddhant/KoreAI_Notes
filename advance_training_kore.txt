@@ -1,0 +1,293 @@
+Advance training Kore Ai chatbot
+
+1. context management---
+
+                                 3 types of interruption management-
+                                      i.Bot level
+                                     ii.task level
+                                    iii.node level
+ 
+------------------------------------------------------------------------------------------------------------------------------------------
+i. bot level interruption managment- 
+
+in Intelligence section in Manage Interruption, you can manage interruptions by holding 
+the current task and initiating another task. you can set interruption management setting according to your own
+requiremnet. check in intelligence->interruption management settings
+------------------------------------------------------------------------------------------------------------------------------------------
+ii. task level interruption managment- 
+
+in this you can set no interruption allowed for the tasks, but if you want t o set interruption management for particular task you
+can set that by going to dialog task->click on 3 dots at right end of dialog task->manage interruption task->customize accordingly.
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+2. sentiment management
+
+if user is angry,sad,joyful etc. feeling these things then go for sentiment manage. 
+
+-------------------------------------------------------------------------------------------
+
+Traits- These are small words for intent qualification
+
+Its easy to create , go in Natural language->training->traits
+
+give any appropriate name, define traits then define similar words for the same.
+
+Traits are of 2-types---i.ML engine(Machine Learning)  ii. pattern type
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+Amend Entity
+Sub-intents
+
+These are used for eg. if you are invoking "make payment" task , you give your account id but then you remember it was wrong bank account number,
+now you want to change,modify account number then this sub-intent can be used.
+
+you have to group those entities (by holding ctrl + drag mouse within those entities) and then create new intent give it name, and then go to setting 
+then in "Fullfillment" section set value of account number as "null" and in transition flow select "Jump to" and that node where you have to go back,
+in this case it is "Account number".
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+Variables -- They are of 2 tyapes 1.Enviorment variables 2.content variables
+
+1.Enviorment Variables- Go in configuration define your service node , give it name also 
+
+and in bot action while defining service use {{env."Enviorment-variable-name"}}{{context.entities."name-of-entity"}}
+
+These are usefull for api. you dont need to hardcode api everytime. 
+
+2.Content Variables- just below enviorment varibales you can find content variables. use for entities defination and usefull in multilingual bot.
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Personally Identifiable Information PII
+
+(Using for Check balance)
+
+For sensitive info like Account Number, Email Id etc we use PII. 
+
+1)Go to PII setting Make the desirable settings in there.
+like name of the entity for which u have to apply PII setting and if any regex is there but remember it must be same (name of entity,regex) and choose
+how you want to hide info.
+
+2) Then go to that entity in its configuration select "Use the original value of the PII data while presenting it to the user."
+
+3) Then come in service node which in this case is "fetch_balance" -> go in advance -> and select "Yes, use original 
+values of PII data while making service calls".
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+if you want to display your list horizontally then (using open account task)
+1)go to entity.
+2)in "User Prompt" select add prompt then select only 'web-client' channel
+and in advance select "quick replies" template
+
+(this is one example)
+var quickReplies = ["Savings", "Current"];          //your values
+var message = {
+    "type": "template",
+    "payload": {
+        "template_type": "quick_replies",
+        "text": "Select Type Of Account",
+        "quick_replies": []                           //empty array
+    }
+};
+
+for (i = 0; i < quickReplies.length; i++) {
+    //if only text needs to diplayed
+    var quickReply = {
+        "content_type": "text",
+        "title": quickReplies[i],
+        "payload": quickReplies[i]                              //looping from quickReplies and assigning it to Payload
+    };
+    
+
+/* Uncomment this if both text and image needs to displayed for the  quick reply button
+     var quickReply = {
+     "content_type":"text",
+     "title":quickReplies[i],
+     "payload":"payload2",
+     "image_url": "url of the image
+     };
+     */
+    message.payload.quick_replies.push(quickReply);           //whatever data in quickReply will be pushed in quick_replies
+}
+print(JSON.stringify(message));
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+for using custom tags in custom dashboard (in this case using open account task to get data of how many users requested for either 
+                                                                                  savings or current account)
+
+           1)go in "open account"
+           2)at the listOfAccounts entity attach one 'script node' and define script 
+           tags.addMessageLevelTag("userAcctType",context.entities.listOfAccounts);   //in this case using addMessageLevelTag you can use user and session
+           tag also just put user or session in the place of message.
+           3)Deploy the bot
+          4)come to analyze->custom dashboard->add widget-> it comes in 'Analytic' dataset ->in 'select' messageTag.userAcctType, count(taskName) as Total 
+                                                                                                                       ^^
+                                                                                                                       ||
+                                                                                                                      this is from 2nd step look at 2nd number.
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Testing bot--
+
+1st record chat.
+2.then do conversation testing.
+
+
+--------------------------------------------------
+
+API lsit-
+
+1.Serach for API list in documentation
+2.Then go to deploy.
+3.then in Integration->API scope
+4.create  new scope.
+5.create "New app"
+6.give any name.
+7.you will get client id and client secret
+8.deploy bot again.
+9.come to jwt.io
+10.in Payload : Data
+
+write "appId": "client-id"
+11.in verify signature:
+in that text-box give "client-secret"
+
+12.come in postman ---
+(This is API of find intent u can find it in API list )
+https://bots.kore.ai/api/v1.1/rest/bot/st-ddcfee57-0e17-548f-89eb-8407598b4629/findIntent?fetchConfiguredTasks=true
+                                             ^
+                                             |
+                                        This is "BOT-ID" you will find in deploy->Integration->API scope->App you have created for bot
+
+Then paste above API in postman its of "POST" type 
+13.Then in "Headers" define "KEY" as "auth" and "value" as "JWT tokn that you have created using above steps"
+
+(this is sample request to make in postman)
+14.then in documanetation using sample response {
+     "parentIntent": "{{parent intent}}",        //not required in our case
+     "input": "{{user utterance}}",              //give here intent name like check balance.
+     "streamName": "{{bot name}}"                //name of bot give it as it is
+   }
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+creating web-hook channel 
+
+1)Deploy->channels->Web-Hook->in Configuration 
+give any name to cahnnel as well as app 
+Select HS256 in one place 
+u will get Bot name, Bot Id, Client id, Client secret just like API scopes.
+
+2)use client id and client secret to create JWT token so we can use the web-hook url in postman
+in PYLOAD: DATA 
+
+along with "appId" we need "sub"-this can be any numeric value . just give like "1234"
+
+sample-{
+ "appId":"cs-ccb27846-71ed-5510-b641-dea8bff69f7e",    //client id
+ "sub":"1234"                                          //any integer value
+ }
+ 
+in verify signature 
+
+give client secret
+u will get JWT token 
+
+3)come in postman post the url from webhook channel 
+its "post" method in our case 
+
+4) in Headers "KEY" as "Authorization" value as "bearer followed by JWT token"---"bearer word is mandatory" 
+
+5) in body , select raw->json and sample request is->
+{
+"message":{
+            "type": "text",                                   //u can find it in webhook channel in configuration
+            "val": "make payment"
+           },
+    "from" :{
+        "id": "sp29061998@gmail.com"
+            }
+        
+	}
+**To remember- 
+webhook and web/client channels are different.
+
+webhook urls can be used in external application like postman for testing api whereas web/client channel url can be used in browser.
+
+in postman , in headers "key" for API scope is "auth" and for WEBHOOK its "Authorization"
+value is JWT token only.
+
+always 1st deploy bot and then create JWT token otherwise it will give u error
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+   for Universal Bot watch 2nd Session time 2:40:00 to 3:06:00
+
+
+--------------------------------------------------------------------------------------
+   Bot kit
+
+for connecting bot to live agents.
+
+requires external NLP engine and 
+
+1.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

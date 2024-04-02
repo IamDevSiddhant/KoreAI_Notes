@@ -1,0 +1,62 @@
+
+jayanti.chakraborty@kore.com
+
+
+NLP training is done by 3 engines
+1.ML engine-Machine Learning
+2.FM engine-Fundamental Meaning
+3.KG engine-Knowledge Graph
+
+
+ML- (Used for Dialog task) it is used for intent utterances. user can initiate task using these possible intents utterances.
+when you define utterances like how much money do i have then you dont need to define another utterance saying how much cash do i have.
+just go to bot synonyms and there create new synonym for a word cash define synonyms and train the bot and thats it.
+
+FM-(Used for Dialog task)  it is used for patterns of intents.
+for example t initiate task make payment-
+<payment - this describes that first word is "payment" in sentence.
+payment> - this describes that last word is "payment" in sentence.
+<payment> -nothing before nothing after only "payment"in sentence
+
+<[pay transfer]> -any one of the word . but only one of these words
+
+now to initialize check balance task patterns are-
+
+payment[transfer process pay ]-this means any words before the defined words any words after these words and max 3 words between these words.
+
+<<payment[transfer process pay ]>>-any order in this will invoke check balance task
+
+idiomatic statemnets:
+[family friend]*[cash fund money]-this describes that after family or friend there can be any number of words in between and then cash or fund or money
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Fetching data from table-
+
+1.when you are using external table using api and want to get data then format is like {{context."Service-node-name".response.body."table-Column-name"}}
+
+2.when you are using internal table and want to get data then format is like {{context."Service-node-name".response.body.queryResult[0]."table-Column-name"}}
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+there is no need to use "{{ }}" this when you have define condition in if-else and in script.
+
+apart from that everywhere "{{ }}" curly brackets are required for dynamic data.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
